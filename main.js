@@ -1,24 +1,89 @@
-import './style.css'
-import javascriptLogo from './javascript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.js'
+import "./style.css"
 
-document.querySelector('#app').innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript" target="_blank">
-      <img src="${javascriptLogo}" class="logo vanilla" alt="JavaScript logo" />
-    </a>
-    <h1>Hello Vite!</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite logo to learn more
-    </p>
-  </div>
-`
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-setupCounter(document.querySelector('#counter'))
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer({
+    canvas: document.querySelector('#bg'),
+});
+
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(window.innerWidth, window.innerHeight);
+camera.position.setZ(30);
+camera.position.setX(-3);
+
+const geometry = new THREE.TorusGeometry(10, 3, 16, 1000);
+const material = new THREE.MeshStandardMaterial({ color: 0xFF6347 });
+const torus = new THREE.Mesh(geometry, material);
+scene.add(torus);
+
+const pointLight = new THREE.PointLight(0xffffff, 250, 0, 2);
+pointLight.position.set(10, 10, 10);
+scene.add(pointLight);
+
+const ambientLight = new THREE.AmbientLight(0xffffff);
+ambientLight.intensity = 1;
+scene.add(ambientLight);
+
+// const lightHelper = new THREE.PointLightHelper(pointLight);
+// const gridHelper = new THREE.GridHelper(200, 50);
+// scene.add(lightHelper, gridHelper);
+
+function addStar() {
+    const geometry = new THREE.SphereGeometry(0.25, 24, 24);
+    const material = new THREE.MeshStandardMaterial({ color: 0xffffff });
+    const star = new THREE.Mesh(geometry, material);
+
+    const [x, y, z] = Array(3).fill().map(() => THREE.MathUtils.randFloatSpread(200));
+    star.position.set(x, y, z);
+    scene.add(star);
+}
+
+Array(200).fill().forEach(addStar);
+
+const spaceTexture = new THREE.TextureLoader().load('./assets/space.jpg');
+spaceTexture.colorSpace = THREE.SRGBColorSpace;
+scene.background = spaceTexture;
+
+const moonTexture = new THREE.TextureLoader().load('./assets/moon.jpg');
+const normalTexture = new THREE.TextureLoader().load('./assets/moon_normal.jpg');
+
+const moon = new THREE.Mesh(
+  new THREE.SphereGeometry(3, 32, 32),
+  new THREE.MeshStandardMaterial({
+    map: moonTexture,
+    normalMap: normalTexture,
+  })
+);
+
+scene.add(moon);
+
+moon.position.z = 30;
+moon.position.setX(-10);
+
+function moveCamera() {
+  const t = document.body.getBoundingClientRect().top;
+  camera.position.z = t * -0.01;
+  camera.position.x = t * -0.0002;
+  camera.rotation.y = t * -0.0002;
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    torus.rotation.x += 0.01;
+    torus.rotation.y += 0.005;
+    torus.rotation.z += 0.01;
+
+    moon.rotation.x += 0.01;
+    // moon.rotation.y += 0.075;
+    // moon.rotation.z += 0.05;
+    // controls.update();
+    moveCamera();
+    renderer.render(scene, camera);
+}
+
+animate();
+moveCamera();
