@@ -79,3 +79,22 @@ canvas {
   .left {
     grid-column: 11 / span 8;
   }
+
+  @media (max-width: 768px) {
+    main {
+      grid-template-columns: repeat(8, 1fr); /* Adjust columns for smaller screens */
+      padding: 60px 0px; /* Reduce padding */
+    }
+    header, section, blockquote {
+      grid-column: 1 / span 8; /* Span full width on mobile */
+    }
+    blockquote p {
+      font-size: 2rem; /* Reduce text size for mobile */
+    }
+    h1, h2, h3 {
+      font-size: 1.5rem; /* Reduce header sizes for mobile */
+    }
+    .left {
+      grid-column: 1 / span 8; /* Align content for smaller screens */
+    }
+  }

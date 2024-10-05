@@ -92,5 +92,13 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap for performance on mobile
+});
+
 animate();
 moveCamera();
